@@ -1,9 +1,6 @@
 import gradio as gr
-from pdf_utils import extract_text_from_pdf
-
-
-from pdf_utils import extract_pages
-from summarizer import summarize_long
+from backend.pdf_utils import extract_pages
+from backend.summarizer import summarize_long
 
 def process_pdf(pdf_file):
     if pdf_file is None:
