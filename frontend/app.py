@@ -1,17 +1,16 @@
 import gradio as gr
-from pdf_utils import extract_text_from_pdf
-
-from summarizer import summarize
+from backend.pdf_utils import extract_pages
+from backend.summarizer import summarize_long
 
 def process_pdf(pdf_file):
     if pdf_file is None:
         return "Please upload a PDF first."
 
-    pdf_text = extract_text_from_pdf(pdf_file)
-    if not pdf_text.strip():
+    pages = extract_pages(pdf_file)
+    if not pages:
         return "No text found in this PDF (it may be a scanned image)."
 
-    return summarize(pdf_text)
+    return summarize_long(pages)
 
 demo = gr.Interface(
     fn=process_pdf,
