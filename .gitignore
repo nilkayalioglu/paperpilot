@@ -7,3 +7,6 @@ papers/
 flagged/
 .DS_Store
 .pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
