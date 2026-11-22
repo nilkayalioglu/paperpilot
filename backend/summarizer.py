@@ -1,5 +1,6 @@
 import ollama
 from backend.config import OLLAMA_HOST, CHAT_MODEL, SECTION_CHARS
+from backend.rag import split_text
 
 client = ollama.Client(host=OLLAMA_HOST)
 MODEL = CHAT_MODEL
@@ -39,17 +40,21 @@ def _ask(prompt: str) -> str:
 
 
 def group_pages(pages, max_chars: int = SECTION_CHARS) -> list[str]:
-    """Group consecutive pages into sections of at most max_chars characters."""
+    """Group consecutive pages into sections of at most max_chars characters.
+    Pages longer than max_chars are split first, so no text is lost."""
     sections, current = [], ""
     for p in pages:
-        if current and len(current) + len(p["text"]) > max_chars:
-            sections.append(current)
-            current = ""
-        current += p["text"] + "\n"
+        for piece in split_text(p["text"], size=max_chars, overlap=0):
+            if current and len(current) + 1 + len(piece) > max_chars:
+                sections.append(current)
+                current = ""
+            if current:
+                current += "\n" + piece
+            else:
+                current = piece
     if current:
         sections.append(current)
     return sections
-
 
 def summarize_long(pages, group_chars: int = SECTION_CHARS) -> str:
     # 1) Group consecutive pages into sections the model can read at once

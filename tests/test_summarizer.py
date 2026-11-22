@@ -25,3 +25,11 @@ def test_group_pages_keeps_every_page():
     joined = "".join(group_pages(pages, max_chars=20))
     for i in range(1, 11):
         assert f"page{i}" in joined
+
+
+def test_group_pages_splits_long_page():
+    pages = [{"page": 1, "text": "a" * 6001}]
+    sections = group_pages(pages, max_chars=6000)
+    assert len(sections) == 2
+    assert all(len(s) <= 6000 for s in sections)
+    assert sum(len(s) for s in sections) == 6001
