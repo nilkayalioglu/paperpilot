@@ -1,7 +1,8 @@
 import ollama
+from backend.config import OLLAMA_HOST, CHAT_MODEL, SECTION_CHARS
 
-client = ollama.Client(host="http://localhost:11434")
-MODEL = "llama3.2:1b"
+client = ollama.Client(host=OLLAMA_HOST)
+MODEL = CHAT_MODEL
 
 SYSTEM_PROMPT = (
     "You are PaperPilot, an AI research assistant. "
@@ -37,7 +38,7 @@ def _ask(prompt: str) -> str:
     return response["message"]["content"]
 
 
-def summarize_long(pages, group_chars: int = 6000) -> str:
+def summarize_long(pages, group_chars: int = SECTION_CHARS) -> str:
     # 1) Group consecutive pages into sections the model can read at once
     sections, current = [], ""
     for p in pages:
