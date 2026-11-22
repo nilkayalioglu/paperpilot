@@ -6,3 +6,4 @@ papers/
 .gradio/
 flagged/
 .DS_Store
+.pytest_cache/
