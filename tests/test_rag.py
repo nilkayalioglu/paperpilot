@@ -1,4 +1,4 @@
-from backend.rag import split_text, chunk_pages
+from backend.rag import split_text, chunk_pages, embed_texts
 
 
 def test_short_text_is_one_piece():
@@ -31,3 +31,7 @@ def test_chunk_pages_keeps_page_numbers():
     ]
     chunks = chunk_pages(pages, size=1000, overlap=150)
     assert [c["page"] for c in chunks] == [1, 1, 1, 2]
+
+
+def test_embed_texts_empty_list_skips_ollama():
+    assert embed_texts([]) == []

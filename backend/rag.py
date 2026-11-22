@@ -1,5 +1,7 @@
-from backend.config import CHUNK_CHARS, CHUNK_OVERLAP
+import ollama
+from backend.config import OLLAMA_HOST, EMBED_MODEL, CHUNK_CHARS, CHUNK_OVERLAP
 
+client = ollama.Client(host=OLLAMA_HOST)
 
 def split_text(text, size=CHUNK_CHARS, overlap=CHUNK_OVERLAP):
     """Split text into pieces of at most `size` characters.
@@ -22,3 +24,17 @@ def chunk_pages(pages, size=CHUNK_CHARS, overlap=CHUNK_OVERLAP):
         for piece in split_text(page["text"], size, overlap):
             chunks.append({"page": page["page"], "text": piece})
     return chunks
+
+
+def embed_texts(texts):
+    """Turn a list of texts into a list of vectors (768 numbers each)."""
+    if not texts:
+        return []
+    response = client.embed(model=EMBED_MODEL, input=texts)
+    return response["embeddings"]
+
+
+def embed_chunks(chunks):
+    """Embed every chunk once, when the PDF is uploaded."""
+    texts = ["search_document: " + c["text"] for c in chunks]   
+    return embed_texts(texts)
