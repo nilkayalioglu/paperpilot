@@ -6,6 +6,9 @@ client = ollama.Client(host=OLLAMA_HOST)
 def split_text(text, size=CHUNK_CHARS, overlap=CHUNK_OVERLAP):
     """Split text into pieces of at most `size` characters.
     Consecutive pieces share `overlap` characters."""
+     
+    if size <= 0 or not 0 <= overlap < size:
+        raise ValueError("size must be > 0 and 0 <= overlap < size")
     pieces = []
     step = size - overlap
     start = 0

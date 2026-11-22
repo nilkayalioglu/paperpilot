@@ -1,4 +1,5 @@
 from backend.rag import split_text, chunk_pages, embed_texts
+import pytest
 
 
 def test_short_text_is_one_piece():
@@ -35,3 +36,8 @@ def test_chunk_pages_keeps_page_numbers():
 
 def test_embed_texts_empty_list_skips_ollama():
     assert embed_texts([]) == []
+
+
+def test_split_text_rejects_overlap_equal_to_size():
+    with pytest.raises(ValueError):
+        split_text("hello world", size=10, overlap=10)
