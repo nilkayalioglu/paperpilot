@@ -46,7 +46,10 @@ def embed_chunks(chunks):
 def cosine_similarity(a, b):
     """1 = same direction (similar meaning), 0 = unrelated, -1 = opposite."""
     a, b = np.array(a), np.array(b)
-    return float(a @ b / (np.linalg.norm(a) * np.linalg.norm(b)))
+    norm_a, norm_b = np.linalg.norm(a), np.linalg.norm(b)
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return float(a @ b / (norm_a * norm_b))
 
 
 def rank_chunks(question_vector, chunks, vectors, k=TOP_K):

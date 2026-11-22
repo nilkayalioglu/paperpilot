@@ -89,3 +89,13 @@ def test_no_good_match_when_nothing_found():
 
 def test_format_sources_empty_list():
     assert format_sources([]) == ""
+
+
+def test_cosine_zero_vector_is_0():
+    assert cosine_similarity([0, 0], [1, 0]) == 0.0
+
+
+def test_rank_chunks_not_broken_by_zero_vector():
+    chunks = [{"page": 1, "text": "a"}, {"page": 2, "text": "b"}]
+    top = rank_chunks([1, 0], chunks, [[0, 0], [1, 0]], k=1)
+    assert top[0]["page"] == 2
