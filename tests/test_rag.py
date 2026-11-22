@@ -1,6 +1,6 @@
 import pytest
 
-from backend.rag import split_text, chunk_pages, embed_texts, cosine_similarity, rank_chunks, build_context
+from backend.rag import split_text, chunk_pages, embed_texts, cosine_similarity, rank_chunks, build_context, format_sources
 def test_short_text_is_one_piece():
     assert split_text("hello", size=10, overlap=3) == ["hello"]
 
@@ -64,3 +64,12 @@ def test_rank_chunks_returns_closest_first():
 def test_build_context_labels_each_chunk_with_its_page():
     results = [{"page": 4, "text": "derivative"}, {"page": 8, "text": "integral"}]
     assert build_context(results) == "[page 4]\nderivative\n\n[page 8]\nintegral"
+
+
+def test_format_sources_sorts_and_removes_duplicates():
+    results = [{"page": 8}, {"page": 4}, {"page": 8}, {"page": 2}]
+    assert format_sources(results) == "Sources: pages 2, 4, 8"
+
+
+def test_format_sources_single_page():
+    assert format_sources([{"page": 4}]) == "Sources: page 4"

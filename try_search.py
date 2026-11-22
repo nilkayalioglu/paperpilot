@@ -1,7 +1,7 @@
 import sys
 
 from backend.pdf_utils import extract_pages
-from backend.rag import chunk_pages, embed_chunks, answer
+from backend.rag import chunk_pages, embed_chunks, answer, format_sources
 
 pdf_path = sys.argv[1]
 question = sys.argv[2]
@@ -17,3 +17,4 @@ for s in sources:
 print()
 print("Answer:")
 print(reply)
+print(format_sources(sources))

@@ -91,3 +91,10 @@ def answer(question, chunks, vectors, k=TOP_K):
     prompt = ANSWER_PROMPT.format(context=build_context(results), question=question)
     response = client.chat(model=CHAT_MODEL, messages=[{"role": "user", "content": prompt}])
     return response["message"]["content"], results
+
+
+def format_sources(results):
+    """Turn the found chunks into a line like 'Sources: pages 2, 4, 8'."""
+    pages = sorted({r["page"] for r in results})
+    label = "page" if len(pages) == 1 else "pages"
+    return f"Sources: {label} " + ", ".join(str(p) for p in pages)
