@@ -1,6 +1,6 @@
 import pytest
 
-from backend.rag import split_text, chunk_pages, embed_texts, cosine_similarity, rank_chunks, build_context, format_sources
+from backend.rag import split_text, chunk_pages, embed_texts, cosine_similarity, rank_chunks, build_context, format_sources,has_good_match
 def test_short_text_is_one_piece():
     assert split_text("hello", size=10, overlap=3) == ["hello"]
 
@@ -73,3 +73,19 @@ def test_format_sources_sorts_and_removes_duplicates():
 
 def test_format_sources_single_page():
     assert format_sources([{"page": 4}]) == "Sources: page 4"
+
+
+def test_has_good_match_when_best_score_is_high():
+    assert has_good_match([{"page": 4, "score": 0.71}], min_score=0.60)
+
+
+def test_no_good_match_when_best_score_is_low():
+    assert not has_good_match([{"page": 4, "score": 0.51}], min_score=0.60)
+
+
+def test_no_good_match_when_nothing_found():
+    assert not has_good_match([], min_score=0.60)
+
+
+def test_format_sources_empty_list():
+    assert format_sources([]) == ""

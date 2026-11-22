@@ -1,6 +1,6 @@
 import numpy as np
 import ollama
-from backend.config import OLLAMA_HOST, EMBED_MODEL, CHAT_MODEL, CHUNK_CHARS, CHUNK_OVERLAP, TOP_K
+from backend.config import OLLAMA_HOST, EMBED_MODEL, CHAT_MODEL, CHUNK_CHARS, CHUNK_OVERLAP, TOP_K, MIN_SCORE
 client = ollama.Client(host=OLLAMA_HOST)
 
 def split_text(text, size=CHUNK_CHARS, overlap=CHUNK_OVERLAP):
@@ -65,6 +65,13 @@ def search(question, chunks, vectors, k=TOP_K):
     return rank_chunks(question_vector, chunks, vectors, k)
 
 
+NOT_FOUND = "I couldn't find this in the paper."
+
+
+def has_good_match(results, min_score=MIN_SCORE):
+    """True if the best chunk is similar enough to the question."""
+    return bool(results) and results[0]["score"] >= min_score
+
 ANSWER_PROMPT = """You are PaperPilot, a research assistant.
 Answer the question using ONLY the excerpts below.
 After each fact, write the page it came from, like (page 4).
@@ -88,6 +95,8 @@ def build_context(results):
 def answer(question, chunks, vectors, k=TOP_K):
     """Find the closest chunks and ask the model to answer from them only."""
     results = search(question, chunks, vectors, k)
+    if not has_good_match(results):
+        return NOT_FOUND, []
     prompt = ANSWER_PROMPT.format(context=build_context(results), question=question)
     response = client.chat(model=CHAT_MODEL, messages=[{"role": "user", "content": prompt}])
     return response["message"]["content"], results
@@ -96,5 +105,7 @@ def answer(question, chunks, vectors, k=TOP_K):
 def format_sources(results):
     """Turn the found chunks into a line like 'Sources: pages 2, 4, 8'."""
     pages = sorted({r["page"] for r in results})
+    if not pages:
+        return ""
     label = "page" if len(pages) == 1 else "pages"
     return f"Sources: {label} " + ", ".join(str(p) for p in pages)
