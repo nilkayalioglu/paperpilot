@@ -1,4 +1,4 @@
-from backend.rag import split_text, chunk_pages, embed_texts
+from backend.rag import split_text, chunk_pages, embed_texts, cosine_similarity, rank_chunks
 import pytest
 
 
@@ -41,3 +41,22 @@ def test_embed_texts_empty_list_skips_ollama():
 def test_split_text_rejects_overlap_equal_to_size():
     with pytest.raises(ValueError):
         split_text("hello world", size=10, overlap=10)
+
+
+def test_cosine_same_direction_is_1():
+    assert cosine_similarity([1, 0], [1, 0]) == pytest.approx(1)
+
+
+def test_cosine_perpendicular_is_0():
+    assert cosine_similarity([1, 0], [0, 1]) == pytest.approx(0)
+
+
+def test_cosine_opposite_is_minus_1():
+    assert cosine_similarity([1, 0], [-1, 0]) == pytest.approx(-1)
+
+
+def test_rank_chunks_returns_closest_first():
+    chunks = [{"page": 1, "text": "a"}, {"page": 2, "text": "b"}, {"page": 3, "text": "c"}]
+    vectors = [[0, 1], [1, 0], [-1, 0]]
+    top = rank_chunks([1, 0], chunks, vectors, k=2)
+    assert [c["page"] for c in top] == [2, 1]
