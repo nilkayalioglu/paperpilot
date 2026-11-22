@@ -1,7 +1,6 @@
-from backend.rag import split_text, chunk_pages, embed_texts
 import pytest
 
-
+from backend.rag import split_text, chunk_pages, embed_texts, cosine_similarity, rank_chunks, build_context, format_sources,has_good_match
 def test_short_text_is_one_piece():
     assert split_text("hello", size=10, overlap=3) == ["hello"]
 
@@ -41,3 +40,62 @@ def test_embed_texts_empty_list_skips_ollama():
 def test_split_text_rejects_overlap_equal_to_size():
     with pytest.raises(ValueError):
         split_text("hello world", size=10, overlap=10)
+
+
+def test_cosine_same_direction_is_1():
+    assert cosine_similarity([1, 0], [1, 0]) == pytest.approx(1)
+
+
+def test_cosine_perpendicular_is_0():
+    assert cosine_similarity([1, 0], [0, 1]) == pytest.approx(0)
+
+
+def test_cosine_opposite_is_minus_1():
+    assert cosine_similarity([1, 0], [-1, 0]) == pytest.approx(-1)
+
+
+def test_rank_chunks_returns_closest_first():
+    chunks = [{"page": 1, "text": "a"}, {"page": 2, "text": "b"}, {"page": 3, "text": "c"}]
+    vectors = [[0, 1], [1, 0], [-1, 0]]
+    top = rank_chunks([1, 0], chunks, vectors, k=2)
+    assert [c["page"] for c in top] == [2, 1]
+
+
+def test_build_context_labels_each_chunk_with_its_page():
+    results = [{"page": 4, "text": "derivative"}, {"page": 8, "text": "integral"}]
+    assert build_context(results) == "[page 4]\nderivative\n\n[page 8]\nintegral"
+
+
+def test_format_sources_sorts_and_removes_duplicates():
+    results = [{"page": 8}, {"page": 4}, {"page": 8}, {"page": 2}]
+    assert format_sources(results) == "Sources: pages 2, 4, 8"
+
+
+def test_format_sources_single_page():
+    assert format_sources([{"page": 4}]) == "Sources: page 4"
+
+
+def test_has_good_match_when_best_score_is_high():
+    assert has_good_match([{"page": 4, "score": 0.71}], min_score=0.60)
+
+
+def test_no_good_match_when_best_score_is_low():
+    assert not has_good_match([{"page": 4, "score": 0.51}], min_score=0.60)
+
+
+def test_no_good_match_when_nothing_found():
+    assert not has_good_match([], min_score=0.60)
+
+
+def test_format_sources_empty_list():
+    assert format_sources([]) == ""
+
+
+def test_cosine_zero_vector_is_0():
+    assert cosine_similarity([0, 0], [1, 0]) == 0.0
+
+
+def test_rank_chunks_not_broken_by_zero_vector():
+    chunks = [{"page": 1, "text": "a"}, {"page": 2, "text": "b"}]
+    top = rank_chunks([1, 0], chunks, [[0, 0], [1, 0]], k=1)
+    assert top[0]["page"] == 2
