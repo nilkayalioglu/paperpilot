@@ -1,7 +1,8 @@
 import ollama
+from backend.config import OLLAMA_HOST, CHAT_MODEL, SECTION_CHARS
 
-client = ollama.Client(host="http://localhost:11434")
-MODEL = "llama3.2:1b"
+client = ollama.Client(host=OLLAMA_HOST)
+MODEL = CHAT_MODEL
 
 SYSTEM_PROMPT = (
     "You are PaperPilot, an AI research assistant. "
@@ -10,7 +11,7 @@ SYSTEM_PROMPT = (
 )
 def _clean_bullets(text: str) -> str:
     """Put each bullet on its own line in Markdown format and drop the intro sentence."""
-    text = text.replace("•", "\n- ")
+    text = text.replace("• ", "\n- ").replace("•", "\n- ")
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     if lines and lines[0].lower().startswith("here"):
         lines = lines[1:]
@@ -37,16 +38,22 @@ def _ask(prompt: str) -> str:
     return response["message"]["content"]
 
 
-def summarize_long(pages, group_chars: int = 6000) -> str:
-    # 1) Group consecutive pages into sections the model can read at once
+def group_pages(pages, max_chars: int = SECTION_CHARS) -> list[str]:
+    """Group consecutive pages into sections of at most max_chars characters."""
     sections, current = [], ""
     for p in pages:
-        if current and len(current) + len(p["text"]) > group_chars:
+        if current and len(current) + len(p["text"]) > max_chars:
             sections.append(current)
             current = ""
         current += p["text"] + "\n"
     if current:
         sections.append(current)
+    return sections
+
+
+def summarize_long(pages, group_chars: int = SECTION_CHARS) -> str:
+    # 1) Group consecutive pages into sections the model can read at once
+    sections = group_pages(pages, group_chars)
 
     # Short paper: one call is enough
     if len(sections) == 1:
