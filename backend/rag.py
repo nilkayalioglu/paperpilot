@@ -13,3 +13,12 @@ def split_text(text, size=CHUNK_CHARS, overlap=CHUNK_OVERLAP):
             break
         start = start + step
     return pieces
+
+
+def chunk_pages(pages, size=CHUNK_CHARS, overlap=CHUNK_OVERLAP):
+    """Split every page into pieces. Each piece keeps its page number."""
+    chunks = []
+    for page in pages:
+        for piece in split_text(page["text"], size, overlap):
+            chunks.append({"page": page["page"], "text": piece})
+    return chunks

@@ -1,4 +1,4 @@
-from backend.rag import split_text
+from backend.rag import split_text, chunk_pages
 
 
 def test_short_text_is_one_piece():
@@ -22,3 +22,12 @@ def test_no_extra_tiny_piece():
 
 def test_empty_text_gives_no_pieces():
     assert split_text("") == []
+
+
+def test_chunk_pages_keeps_page_numbers():
+    pages = [
+        {"page": 1, "text": "a" * 2300},
+        {"page": 2, "text": "b" * 900},
+    ]
+    chunks = chunk_pages(pages, size=1000, overlap=150)
+    assert [c["page"] for c in chunks] == [1, 1, 1, 2]
