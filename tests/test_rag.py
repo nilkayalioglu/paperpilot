@@ -1,7 +1,6 @@
-from backend.rag import split_text, chunk_pages, embed_texts, cosine_similarity, rank_chunks
 import pytest
 
-
+from backend.rag import split_text, chunk_pages, embed_texts, cosine_similarity, rank_chunks, build_context
 def test_short_text_is_one_piece():
     assert split_text("hello", size=10, overlap=3) == ["hello"]
 
@@ -60,3 +59,8 @@ def test_rank_chunks_returns_closest_first():
     vectors = [[0, 1], [1, 0], [-1, 0]]
     top = rank_chunks([1, 0], chunks, vectors, k=2)
     assert [c["page"] for c in top] == [2, 1]
+
+
+def test_build_context_labels_each_chunk_with_its_page():
+    results = [{"page": 4, "text": "derivative"}, {"page": 8, "text": "integral"}]
+    assert build_context(results) == "[page 4]\nderivative\n\n[page 8]\nintegral"

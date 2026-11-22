@@ -1,7 +1,6 @@
 import numpy as np
 import ollama
-from backend.config import OLLAMA_HOST, EMBED_MODEL, CHUNK_CHARS, CHUNK_OVERLAP, TOP_K
-
+from backend.config import OLLAMA_HOST, EMBED_MODEL, CHAT_MODEL, CHUNK_CHARS, CHUNK_OVERLAP, TOP_K
 client = ollama.Client(host=OLLAMA_HOST)
 
 def split_text(text, size=CHUNK_CHARS, overlap=CHUNK_OVERLAP):
@@ -64,3 +63,31 @@ def search(question, chunks, vectors, k=TOP_K):
     """Embed the question and find the closest chunks."""
     question_vector = embed_texts(["search_query: " + question])[0]
     return rank_chunks(question_vector, chunks, vectors, k)
+
+
+ANSWER_PROMPT = """You are PaperPilot, a research assistant.
+Answer the question using ONLY the excerpts below.
+After each fact, write the page it came from, like (page 4).
+If the excerpts do not contain the answer, reply exactly: I couldn't find this in the paper.
+
+Excerpts:
+{context}
+
+Question: {question}
+Answer:"""
+
+
+def build_context(results):
+    """Join the found chunks into one text, each labelled with its page."""
+    parts = []
+    for r in results:
+        parts.append(f"[page {r['page']}]\n{r['text']}")
+    return "\n\n".join(parts)
+
+
+def answer(question, chunks, vectors, k=TOP_K):
+    """Find the closest chunks and ask the model to answer from them only."""
+    results = search(question, chunks, vectors, k)
+    prompt = ANSWER_PROMPT.format(context=build_context(results), question=question)
+    response = client.chat(model=CHAT_MODEL, messages=[{"role": "user", "content": prompt}])
+    return response["message"]["content"], results
