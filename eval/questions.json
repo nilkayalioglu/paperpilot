@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "question": "How many attention heads are used?",
+    "answer": "8",
+    "pages": [5],
+    "answerable": true
+  },
+  {
+    "id": 2,
+    "question": "How many layers does the encoder have?",
+    "answer": "6",
+    "pages": [3],
+    "answerable": true
+  },
+  {
+    "id": 3,
+    "question": "What is the dimension of the model's outputs (d_model)?",
+    "answer": "512",
+    "pages": [3, 5, 9],
+    "answerable": true
+  },
+  {
+    "id": 4,
+    "question": "What is the inner dimension of the feed-forward network?",
+    "answer": "2048",
+    "pages": [5],
+    "answerable": true
+  },
+  {
+    "id": 5,
+    "question": "Which optimizer was used for training?",
+    "answer": "Adam",
+    "pages": [7],
+    "answerable": true
+  },
+  {
+    "id": 6,
+    "question": "How many warmup steps were used?",
+    "answer": "4000",
+    "pages": [7],
+    "answerable": true
+  },
+  {
+    "id": 7,
+    "question": "What hardware was the model trained on?",
+    "answer": "8 NVIDIA P100 GPUs",
+    "pages": [7],
+    "answerable": true
+  },
+    {
+    "id": 8,
+    "question": "How long did it take to train the big model?",
+    "answer": "3.5 days",
+    "pages": [7, 8],
+    "answerable": true
+  },
+    {
+    "id": 9,
+    "question": "What BLEU score did the big model get on English-to-German translation?",
+    "answer": "28.4",
+    "pages": [1, 8],
+    "answerable": true
+  },
+    {
+    "id": 10,
+    "question": "What label smoothing value was used?",
+    "answer": "0.1",
+    "pages": [8],
+    "answerable": true
+  },
+    {
+    "id": 11,
+    "question": "How many parameters does GPT-3 have?",
+    "answer": null,
+    "pages": [],
+    "answerable": false
+  },
+    {
+    "id": 12,
+    "question": "What accuracy does the model achieve on ImageNet?",
+    "answer": null,
+    "pages": [],
+    "answerable": false
+  },
+    {
+    "id": 13,
+    "question": "How much electricity in kWh was used during training?",
+    "answer": null,
+    "pages": [],
+    "answerable": false
+  },
+    {
+    "id": 14,
+    "question": "In which country were the training GPUs located?",
+    "answer": null,
+    "pages": [],
+    "answerable": false
+  },
+  {
+    "id": 15,
+    "question": "What BLEU score does the model get on English-to-Spanish translation?",
+    "answer": null,
+    "pages": [],
+    "answerable": false
+  }
+]
