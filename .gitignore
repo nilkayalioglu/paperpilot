@@ -10,3 +10,4 @@ flagged/
 .coverage
 htmlcov/
 coverage.xml
+*.db
