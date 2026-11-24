@@ -15,3 +15,5 @@ CHUNK_CHARS = 1000        # size of each chunk
 CHUNK_OVERLAP = 150       # characters shared between neighbouring chunks
 TOP_K = 4                 # how many chunks to give the model
 MIN_SCORE = 0.60
+
+CACHE_PATH = os.getenv("PAPERPILOT_CACHE", "paperpilot_cache.db")
