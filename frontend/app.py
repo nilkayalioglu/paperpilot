@@ -1,6 +1,6 @@
 import gradio as gr
 
-from backend.cache import connect, load_or_build
+from backend.cache import connect, load_or_build, load_or_build_summary
 from backend.pdf_utils import extract_pages
 from backend.rag import NOT_FOUND, answer, format_sources
 from backend.summarizer import summarize_long
@@ -9,11 +9,16 @@ from backend.summarizer import summarize_long
 def summarize_pdf(pdf_path):
     if pdf_path is None:
         return "Please upload a PDF first."
-    pages = extract_pages(pdf_path)
-    if not pages:
-        return "No text found in this PDF (it may be a scanned image)."
-    return summarize_long(pages)
 
+    conn = connect()
+    try:
+        summary = load_or_build_summary(pdf_path, conn)
+    finally:
+        conn.close()
+
+    if summary is None:
+        return "No text found in this PDF (it may be a scanned image)."
+    return summary
 
 def ask_pdf(pdf_path, question):
     if pdf_path is None:
