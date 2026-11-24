@@ -4,7 +4,7 @@ import os
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
 # Models
-CHAT_MODEL = os.getenv("PAPERPILOT_CHAT_MODEL", "llama3.2:1b")
+CHAT_MODEL = os.getenv("PAPERPILOT_CHAT_MODEL", "llama3.2:3b")
 EMBED_MODEL = os.getenv("PAPERPILOT_EMBED_MODEL", "nomic-embed-text")
 
 # Summarisation
