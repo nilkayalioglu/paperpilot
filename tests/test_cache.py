@@ -1,4 +1,4 @@
-from backend.cache import connect, file_hash, save_chunks, load_chunks
+from backend.cache import connect, file_hash, save_chunks, load_chunks, save_summary, load_summary
 
 
 def test_file_hash_same_content_same_hash(tmp_path):
@@ -28,3 +28,14 @@ def test_save_then_load_returns_same_chunks(tmp_path):
 def test_load_unknown_document_returns_empty(tmp_path):
     conn = connect(tmp_path / "test.db")
     assert load_chunks(conn, "not-saved", "model-x") == ([], [])
+
+
+def test_save_and_load_summary(tmp_path):
+    conn = connect(tmp_path / "test.db")
+    save_summary(conn, "abc", "model", "- point one\n- point two")
+    assert load_summary(conn, "abc", "model") == "- point one\n- point two"
+
+
+def test_load_summary_unknown_document(tmp_path):
+    conn = connect(tmp_path / "test.db")
+    assert load_summary(conn, "unknown", "model") is None
