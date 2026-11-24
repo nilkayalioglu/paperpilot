@@ -7,5 +7,20 @@ services:
     volumes:
       - ollama_data:/root/.ollama
 
+  paperpilot:
+    build: .
+    container_name: paperpilot-app
+    ports:
+      - "7860:7860"
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      PAPERPILOT_CACHE: /data/paperpilot_cache.db
+      GRADIO_SERVER_NAME: "0.0.0.0"
+    volumes:
+      - paperpilot_data:/data
+    depends_on:
+      - ollama
+
 volumes:
   ollama_data:
+  paperpilot_data:

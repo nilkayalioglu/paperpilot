@@ -6,8 +6,9 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY main.py .
+COPY backend/ backend/
+COPY frontend/ frontend/
 
 EXPOSE 7860
 
-CMD ["python", "main.py"]
+CMD ["python", "-m", "frontend.app"]
