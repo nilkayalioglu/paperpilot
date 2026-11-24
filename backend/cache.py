@@ -2,7 +2,7 @@ import hashlib
 import json
 import sqlite3
 
-from backend.config import CACHE_PATH, EMBED_MODEL
+from backend.config import CACHE_PATH, CHUNK_CHARS, CHUNK_OVERLAP, EMBED_MODEL
 from backend.pdf_utils import extract_pages
 from backend.rag import chunk_pages, embed_chunks
 
@@ -50,13 +50,12 @@ def load_chunks(conn, doc_hash, model):
     return chunks, vectors
 
 def load_or_build(pdf_path, conn):
-    """Return (chunks, vectors) for a PDF, using the cache if this exact file was seen before."""
     doc_hash = file_hash(pdf_path)
-    chunks, vectors = load_chunks(conn, doc_hash, EMBED_MODEL)
+    cache_key = f"{EMBED_MODEL}|{CHUNK_CHARS}|{CHUNK_OVERLAP}"
+    chunks, vectors = load_chunks(conn, doc_hash, cache_key)
     if chunks:
-        return chunks, vectors          # cache hit: no embedding needed
-
+        return chunks, vectors
     chunks = chunk_pages(extract_pages(pdf_path))
     vectors = embed_chunks(chunks)
-    save_chunks(conn, doc_hash, EMBED_MODEL, chunks, vectors)
+    save_chunks(conn, doc_hash, cache_key, chunks, vectors)
     return chunks, vectors

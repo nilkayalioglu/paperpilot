@@ -1,17 +1,4 @@
 import sys
-
-from backend.pdf_utils import extract_pages
-from backend.rag import chunk_pages, embed_chunks, answer, format_sources
-
-pdf_path = sys.argv[1]
-question = sys.argv[2]
-
-chunks = chunk_pages(extract_pages(pdf_path))
-vectors = embed_chunks(chunks)
-
-reply, sources = answer(question, chunks, vectors)
-
-import sys
 import time
 
 from backend.cache import connect, load_or_build
