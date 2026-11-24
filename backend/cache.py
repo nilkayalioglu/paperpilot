@@ -49,14 +49,14 @@ def load_chunks(conn, doc_hash, model):
     vectors = [json.loads(vector) for page, text, vector in rows]
     return chunks, vectors
 
-def load_or_build(pdf_path, conn, model=EMBED_MODEL):
+def load_or_build(pdf_path, conn):
     """Return (chunks, vectors) for a PDF, using the cache if this exact file was seen before."""
     doc_hash = file_hash(pdf_path)
-    chunks, vectors = load_chunks(conn, doc_hash, model)
+    chunks, vectors = load_chunks(conn, doc_hash, EMBED_MODEL)
     if chunks:
         return chunks, vectors          # cache hit: no embedding needed
 
     chunks = chunk_pages(extract_pages(pdf_path))
     vectors = embed_chunks(chunks)
-    save_chunks(conn, doc_hash, model, chunks, vectors)
+    save_chunks(conn, doc_hash, EMBED_MODEL, chunks, vectors)
     return chunks, vectors
