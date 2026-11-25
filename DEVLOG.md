@@ -47,3 +47,12 @@
 - The Dockerfile still copied the old main.py, which I deleted yesterday, so the image was broken. It now copies backend/ and frontend/ and runs `python -m frontend.app`.
 - docker-compose now starts both Ollama and the app with one command (`docker compose up -d --build`). The app reaches Ollama by its service name (OLLAMA_HOST=http://ollama:11434), Gradio listens on 0.0.0.0 so the browser outside the container can reach it, and the SQLite cache lives in a named volume so it survives restarts.
 - Added .dockerignore (based on .gitignore, plus .git) so .venv, papers, .env and the cache database are not copied into the image.
+- Acted on review feedback about the evaluation:
+  - is_correct now removes page citations like "(page 8)" before matching, so a page number is not taken as the answer, and its docstring says it is a simple automatic check that does not understand meaning. Replies are also read by hand. Added 2 tests (46 pass).
+  - The answer prompt no longer asks the model to write page numbers, since it often got them wrong. The UI label changed from "Sources" to "Retrieved from", because the pages show where retrieval looked, not proof that the answer is right.
+  - run_eval.py now repeats the questions 3 times, because answers vary between runs.
+- Results on attention.pdf (15 questions, 3 runs each):
+  - llama3.2:3b: retrieval 10/10, correct 30/30 (10, 10, 10), said "not found" 15/15.
+  - llama3.2:1b: retrieval 10/10, correct 28/30 (10, 8, 10), said "not found" 2/15 (1, 1, 0).
+- Reading the 1b replies by hand: one "not found" was a real refusal in its own words ("There is no mention of electricity usage…"), which the automatic check missed. Another started with "the text does not explicitly state…" and then guessed anyway. The rest invented answers (e.g. "BLEU 41.0 on English-to-Spanish").
+- Limitations: one paper and 15 questions. 3b did not invent answers to these 5 unanswerable questions in 3 runs, but this does not show that it never hallucinates.

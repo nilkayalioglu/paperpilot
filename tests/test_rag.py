@@ -68,11 +68,11 @@ def test_build_context_labels_each_chunk_with_its_page():
 
 def test_format_sources_sorts_and_removes_duplicates():
     results = [{"page": 8}, {"page": 4}, {"page": 8}, {"page": 2}]
-    assert format_sources(results) == "Sources: pages 2, 4, 8"
+    assert format_sources(results) == "Retrieved from: pages 2, 4, 8"
 
 
 def test_format_sources_single_page():
-    assert format_sources([{"page": 4}]) == "Sources: page 4"
+    assert format_sources([{"page": 4}]) == "Retrieved from: page 4"
 
 
 def test_has_good_match_when_best_score_is_high():

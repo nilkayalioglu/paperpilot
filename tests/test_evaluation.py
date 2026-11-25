@@ -40,3 +40,11 @@ def test_is_correct_rejects_decimal_part():
 
 def test_is_correct_number_at_end_of_sentence():
     assert is_correct("0.1", "The label smoothing value was 0.1.") == True
+
+
+def test_is_correct_ignores_page_citation():
+    assert is_correct("8", "The encoder uses 6 layers (page 8).") == False
+
+
+def test_is_correct_answer_next_to_citation():
+    assert is_correct("8", "[page 5] The Transformer uses 8 heads.") == True
