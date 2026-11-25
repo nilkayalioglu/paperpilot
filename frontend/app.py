@@ -23,7 +23,7 @@ def summarize_pdf(pdf_path, progress=gr.Progress()):
     if pdf_path is None:
         return "Please upload a PDF first."
 
-    progress(0, desc="Summarizing the paper. The first time can take a minute...")
+    progress(0, desc="Summarizing the paper. The first time can take a few minutes...")
     conn = connect()
     try:
         summary = load_or_build_summary(pdf_path, conn)
@@ -66,6 +66,7 @@ with gr.Blocks(title="PaperPilot") as demo:
 
     with gr.Tabs():
         with gr.Tab("Summary"):
+            gr.Markdown("The first summary of a paper can take a few minutes on a laptop, because the model reads the paper section by section. After that it is saved and appears instantly.")
             summary_button = gr.Button("Summarize", variant="primary")
             summary_output = gr.Markdown()
 
