@@ -1,0 +1,14 @@
+.git
+.venv/
+__pycache__/
+*.pyc
+.env
+papers/
+.gradio/
+flagged/
+.DS_Store
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.db
