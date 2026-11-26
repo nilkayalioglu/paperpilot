@@ -29,7 +29,7 @@
 - Added 4 tests with a temporary database (tmp_path), so they don't need Ollama or touch the real cache. 33 tests pass. Note: tests only collect with `python -m pytest`, plain `pytest` can't find the backend package.
 - Noticed that llama3.2:1b gave different answers to the same question with exactly the same retrieved chunks: "no mention of the number of heads" on one run, "8" on the next. The answers are not stable, which is another reason to compare it with 3b.
 - CodeRabbit review on PR #5 found two issues, both fixed: `load_or_build` took a `model` argument that `embed_chunks` ignored, so vectors could be stored under the wrong model name (removed the argument, always use `EMBED_MODEL`); and `try_search.py` still ran the old embedding pipeline before the cached one, so every run embedded the PDF and called the model twice (removed the old lines). A third review asked to include chunking settings in the cache key; the key is now model|chunk_chars|overlap.
--Question phrasing matters for the 1b model: "How many heads?" got a wrong answer, while "How many attention heads does the Transformer use?" got the correct answer (8, page 5) with higher retrieval scores (0.67 → 0.77).
+- Question phrasing matters for the 1b model: "How many heads?" got a wrong answer, while "How many attention heads does the Transformer use?" got the correct answer (8, page 5) with higher retrieval scores (0.67 → 0.77).
 - Wrote eval/run_eval.py: asks all 15 questions in eval/questions.json and scores retrieval (Hit@4), answer accuracy and "not found" on unanswerable questions. The PDF and question file can be passed as arguments, so it works with any paper that has a question file. Added 6 tests for backend/evaluation.py (39 tests pass).
 - Results on attention.pdf:
   - llama3.2:1b: Hit@4 10/10, correct 8/10, said "not found" 0/5.
@@ -40,5 +40,27 @@
 - Rebuilt the Gradio interface with gr.Blocks: one PDF upload shared by two tabs, "Summary" and "Ask a question". Answers show the source pages from retrieval in bold. When the model replies "I couldn't find this in the paper", the sources line is hidden, because showing pages next to "not found" was confusing.
 - The SQLite connection is opened and closed inside each button handler, because Gradio runs handlers in worker threads and a SQLite connection can only be used in the thread that created it.
 - Summaries were slow with llama3.2:3b, because summarize_long makes one model call per section plus one to combine the notes, and nothing was saved. Added a `summaries` table to the cache, keyed by file hash and `model|section_chars`, so changing the model or section size makes a new summary. The first summary of a paper is still slow; after that it is instant. Added 2 tests (41 pass).
-- Next: a progress message while the first summary runs, and clearer errors (Ollama not running, scanned PDF).
 - Added friendly error messages: if Ollama is not running, the app says to start it with `docker compose up -d`; if a model is missing (404), it names the model and shows the `docker exec paperpilot-ollama ollama pull ...` commands. Tested both by stopping the container and by setting PAPERPILOT_CHAT_MODEL to a model that doesn't exist. The summary tab now shows a progress message while the first summary runs.
+- End-to-end check: with Docker stopped, uploading a paper showed the "Can't reach Ollama" message instead of crashing. After starting Docker, the same running app worked without a restart. After stopping and starting everything again, the paper loaded instantly from the cache, so the SQLite cache survives restarts.
+
+## 25 Nov
+- The Dockerfile still copied the old main.py, which I deleted yesterday, so the image was broken. It now copies backend/ and frontend/ and runs `python -m frontend.app`.
+- docker-compose now starts both Ollama and the app with one command (`docker compose up -d --build`). The app reaches Ollama by its service name (OLLAMA_HOST=http://ollama:11434), Gradio listens on 0.0.0.0 so the browser outside the container can reach it, and the SQLite cache lives in a named volume so it survives restarts.
+- Added .dockerignore (based on .gitignore, plus .git) so .venv, papers, .env and the cache database are not copied into the image.
+- Acted on review feedback about the evaluation:
+  - is_correct now removes page citations like "(page 8)" before matching, so a page number is not taken as the answer, and its docstring says it is a simple automatic check that does not understand meaning. Replies are also read by hand. Added 2 tests (46 pass).
+  - The answer prompt no longer asks the model to write page numbers, since it often got them wrong. The UI label changed from "Sources" to "Retrieved from", because the pages show where retrieval looked, not proof that the answer is right.
+  - run_eval.py now repeats the questions 3 times, because answers vary between runs.
+- Results on attention.pdf (15 questions, 3 runs each):
+  - llama3.2:3b: retrieval 10/10, correct 30/30 (10, 10, 10), said "not found" 15/15.
+  - llama3.2:1b: retrieval 10/10, correct 28/30 (10, 8, 10), said "not found" 2/15 (1, 1, 0).
+- Reading the 1b replies by hand: one "not found" was a real refusal in its own words ("There is no mention of electricity usage…"), which the automatic check missed. Another started with "the text does not explicitly state…" and then guessed anyway. The rest invented answers (e.g. "BLEU 41.0 on English-to-Spanish").
+- Limitations: one paper and 15 questions. 3b did not invent answers to these 5 unanswerable questions in 3 runs, but this does not show that it never hallucinates.
+
+## 26 Nov
+- CodeRabbit found more edge cases in removing page citations: en dash ranges ("pages 7–8"), an answer right after a reference ("On page 5, 8 heads"), answer text inside brackets ("(page 5 reports 8 heads)") and lists with ", and". Citations are now removed with three patterns, and each case has a test.
+- Bound the app and Ollama ports to 127.0.0.1, so they're only reachable from this computer.
+- Re-ran the evaluation after the scoring changes (3 runs each):
+  - 3b: correct 29/30, refused 15/15. Its one miss was refusing an answerable question (d_model).
+  - 1b: correct 29/30. The automatic check says "not found" 0/15, because 1b never uses the exact sentence. Reading by hand: it refused in its own words 5/15 times and invented an answer 10/15 times.
+- Updated the README and Devpost numbers to match.

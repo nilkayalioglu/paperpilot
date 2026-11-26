@@ -40,3 +40,27 @@ def test_is_correct_rejects_decimal_part():
 
 def test_is_correct_number_at_end_of_sentence():
     assert is_correct("0.1", "The label smoothing value was 0.1.") == True
+
+
+def test_is_correct_ignores_page_citation():
+    assert is_correct("8", "The encoder uses 6 layers (page 8).") == False
+
+
+def test_is_correct_answer_next_to_citation():
+    assert is_correct("8", "[page 5] The Transformer uses 8 heads.") == True
+
+
+def test_is_correct_ignores_en_dash_page_range():
+    assert is_correct("8", "The encoder has 6 layers (pages 7–8).") == False
+
+
+def test_is_correct_keeps_answer_after_page_reference():
+    assert is_correct("8", "On page 5, 8 heads are used.") == True
+
+
+def test_is_correct_keeps_answer_inside_parentheses():
+    assert is_correct("8", "The encoder (page 5 reports 8 heads)") == True
+
+
+def test_is_correct_ignores_page_list_with_comma_and():
+    assert is_correct("8", "See pages 3, 5, and 8.") == False

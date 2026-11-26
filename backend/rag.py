@@ -77,7 +77,6 @@ def has_good_match(results, min_score=MIN_SCORE):
 
 ANSWER_PROMPT = """You are PaperPilot, a research assistant.
 Answer the question using ONLY the excerpts below.
-After each fact, write the page it came from, like (page 4).
 If the excerpts do not contain the answer, reply exactly: I couldn't find this in the paper.
 
 Excerpts:
@@ -106,9 +105,9 @@ def answer(question, chunks, vectors, k=TOP_K):
 
 
 def format_sources(results):
-    """Turn the found chunks into a line like 'Sources: pages 2, 4, 8'."""
+    """Turn the found chunks into a line like 'Retrieved from: pages 2, 4, 8'."""
     pages = sorted({r["page"] for r in results})
     if not pages:
         return ""
     label = "page" if len(pages) == 1 else "pages"
-    return f"Sources: {label} " + ", ".join(str(p) for p in pages)
+    return f"Retrieved from: {label} " + ", ".join(str(p) for p in pages)
