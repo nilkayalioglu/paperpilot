@@ -94,13 +94,15 @@ Results (3 runs each):
 | | llama3.2:3b | llama3.2:1b |
 |---|---|---|
 | Retrieval: right page in top 4 | 10/10 | 10/10 |
-| Correct answers | 30/30 | 28/30 |
-| Said "not found" when the answer isn't in the paper | 15/15 | 2/15 |
+| Correct answers (answer in the paper) | 29/30 | 29/30 |
+| Exact "I couldn't find this in the paper" (automatic check) | 15/15 | 0/15 |
+| Refused in any wording (read by hand) | 15/15 | 5/15 |
 
-Retrieval is the same for both models, so the difference comes from the language model. The 1B model often invented answers to the unanswerable questions (for example, a BLEU score for English-to-Spanish translation, which the paper never reports). This is why 3B is the default.
+Retrieval is the same for both models, and both answer the answerable questions equally well, so the difference is on questions the paper can't answer. The 1B model invented an answer in 10 of 15 cases, for example "GPT-3 has approximately 110 million parameters" or a BLEU score for English-to-Spanish translation, which the paper never reports. The 3B model refused every time. This is why 3B is the default.
 
-**How answers are scored:** a simple automatic check that looks for the expected value in the reply as a whole number or word, after removing page citations. It does not understand meaning ("it does not have 6 layers" would still count), so replies were also read by hand. Reading them showed that one 1B reply refused correctly in its own words, which the automatic check missed.
+The 3B model's one miss was a refusal: in one run it said the excerpts didn't contain d_model, although they did.
 
+**How answers are scored:** a simple automatic check that looks for the expected value in the reply as a whole number or word, after removing page citations. It does not understand meaning, so replies were also read by hand. That's how I found that 1B sometimes refuses in its own words ("not explicitly stated in the excerpts"), which the automatic check counts as a miss.
 ## Limitations
 
 - The evaluation uses one paper and 15 questions. 3B did not invent answers to these 5 unanswerable questions in 3 runs, but that does not show it never hallucinates.

@@ -56,3 +56,11 @@
   - llama3.2:1b: retrieval 10/10, correct 28/30 (10, 8, 10), said "not found" 2/15 (1, 1, 0).
 - Reading the 1b replies by hand: one "not found" was a real refusal in its own words ("There is no mention of electricity usage…"), which the automatic check missed. Another started with "the text does not explicitly state…" and then guessed anyway. The rest invented answers (e.g. "BLEU 41.0 on English-to-Spanish").
 - Limitations: one paper and 15 questions. 3b did not invent answers to these 5 unanswerable questions in 3 runs, but this does not show that it never hallucinates.
+
+## 26 Nov
+- CodeRabbit found more edge cases in removing page citations: en dash ranges ("pages 7–8"), an answer right after a reference ("On page 5, 8 heads"), answer text inside brackets ("(page 5 reports 8 heads)") and lists with ", and". Citations are now removed with three patterns, and each case has a test.
+- Bound the app and Ollama ports to 127.0.0.1, so they're only reachable from this computer.
+- Re-ran the evaluation after the scoring changes (3 runs each):
+  - 3b: correct 29/30, refused 15/15. Its one miss was refusing an answerable question (d_model).
+  - 1b: correct 29/30. The automatic check says "not found" 0/15, because 1b never uses the exact sentence. Reading by hand: it refused in its own words 5/15 times and invented an answer 10/15 times.
+- Updated the README and Devpost numbers to match.
