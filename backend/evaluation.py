@@ -1,11 +1,14 @@
 from backend.rag import NOT_FOUND
 import re
 
+# separators inside a page list: ", and", ",", "and", "-" or "–"
+_SEP = r"(?:,\s*and|,|and|[-–])"
+
 PAGE_CITATIONS = [
     # "(page 8)", "(pages 7–8)", "[page 5]": a bracket that holds only a citation
-    re.compile(r"[(\[]\s*pages?\s*\d+(?:\s*(?:,|and|[-–])\s*\d+)*\s*[)\]]", re.IGNORECASE),
-    # "pages 3, 5 and 8", "pages 7–8": a plural "pages" can be followed by a list
-    re.compile(r"\bpages\s*\d+(?:\s*(?:,|and|[-–])\s*\d+)*", re.IGNORECASE),
+    re.compile(r"[(\[]\s*pages?\s*\d+(?:\s*" + _SEP + r"\s*\d+)*\s*[)\]]", re.IGNORECASE),
+    # "pages 3, 5, and 8", "pages 7–8": a plural "pages" can be followed by a list
+    re.compile(r"\bpages\s*\d+(?:\s*" + _SEP + r"\s*\d+)*", re.IGNORECASE),
     # "page 5", "page 7–8": a single "page" takes one number or one range, not a list
     re.compile(r"\bpage\s*\d+(?:\s*[-–]\s*\d+)?", re.IGNORECASE),
 ]

@@ -60,3 +60,7 @@ def test_is_correct_keeps_answer_after_page_reference():
 
 def test_is_correct_keeps_answer_inside_parentheses():
     assert is_correct("8", "The encoder (page 5 reports 8 heads)") == True
+
+
+def test_is_correct_ignores_page_list_with_comma_and():
+    assert is_correct("8", "See pages 3, 5, and 8.") == False
