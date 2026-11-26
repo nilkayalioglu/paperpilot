@@ -77,7 +77,7 @@ pip install -r requirements-dev.txt
 python -m pytest
 ```
 
-46 tests cover PDF extraction, chunking, retrieval, the cache and the evaluation helpers. They don't need Ollama. Use `python -m pytest`; plain `pytest` can't find the `backend` package.
+50 tests cover PDF extraction, chunking, retrieval, the cache and the evaluation helpers. They don't need Ollama. Use `python -m pytest`; plain `pytest` can't find the `backend` package.
 
 ## Evaluation
 
