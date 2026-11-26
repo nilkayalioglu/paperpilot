@@ -3,7 +3,7 @@ services:
     image: ollama/ollama:latest
     container_name: paperpilot-ollama
     ports:
-      - "11434:11434"
+      - "127.0.0.1:11434:11434"
     volumes:
       - ollama_data:/root/.ollama
 
@@ -11,7 +11,7 @@ services:
     build: .
     container_name: paperpilot-app
     ports:
-      - "7860:7860"
+      - "127.0.0.1:7860:7860"
     environment:
       OLLAMA_HOST: http://ollama:11434
       PAPERPILOT_CACHE: /data/paperpilot_cache.db
