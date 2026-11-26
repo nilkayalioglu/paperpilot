@@ -48,3 +48,11 @@ def test_is_correct_ignores_page_citation():
 
 def test_is_correct_answer_next_to_citation():
     assert is_correct("8", "[page 5] The Transformer uses 8 heads.") == True
+
+
+def test_is_correct_ignores_en_dash_page_range():
+    assert is_correct("8", "The encoder has 6 layers (pages 7–8).") == False
+
+
+def test_is_correct_keeps_answer_after_page_reference():
+    assert is_correct("8", "On page 5, 8 heads are used.") == True
