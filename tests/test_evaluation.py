@@ -56,3 +56,7 @@ def test_is_correct_ignores_en_dash_page_range():
 
 def test_is_correct_keeps_answer_after_page_reference():
     assert is_correct("8", "On page 5, 8 heads are used.") == True
+
+
+def test_is_correct_keeps_answer_inside_parentheses():
+    assert is_correct("8", "The encoder (page 5 reports 8 heads)") == True
