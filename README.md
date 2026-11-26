@@ -118,6 +118,7 @@ eval/       evaluation questions and script
 tests/      pytest tests
 docs/       screenshots
 DEVLOG.md   day-by-day development notes, including what was tried and what changed
+AI_NOTES.md  how AI tools were used during development, and what I tested and changed
 ```
 
 ## Tech
